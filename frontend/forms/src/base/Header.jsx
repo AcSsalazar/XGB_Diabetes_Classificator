@@ -29,7 +29,7 @@ function Header() {
         
         <nav className="main-nav">
           <Link to="/">Home</Link>
-          <Link to="/quote-searcher">Informacion sobre la enfermedad</Link>
+          <Link to="/diabetes-info">Informacion sobre la enfermedad</Link>
           <Link to="/clients">Nuestros Clientes</Link>
           <Link to="/coverage">Casos de exito</Link>
         </nav>
@@ -46,7 +46,7 @@ function Header() {
       {isOpen && (
         <ul className="dropdown-menu">
           <li><a href="https://xgboost.readthedocs.io/en/release_3.0.0/">Sobre XGBoost</a></li>
-          <li><a href="/about-service">GitHub</a></li>
+          <li><a href="https://github.com/AcSsalazar/XGB_Diabetes_Classificator">GitHub</a></li>
         </ul>
       )}
     </div>

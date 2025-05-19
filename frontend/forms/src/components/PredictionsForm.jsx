@@ -153,6 +153,7 @@ function PredictionForm() {
     const error = validateField(currentField, formData[currentField]);
     setFieldError(error);
     setIsCurrentFieldValid(!error);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData, currentStep]);
 
   const handleChange = (e) => {

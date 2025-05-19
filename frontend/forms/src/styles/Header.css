@@ -4,9 +4,9 @@
 .app-header {
 
 
-    background: #36434b;
+    background: #102285b9;
     /* background: radial-gradient(circle, rgba(75,81,116,0.4) 29%, rgba(9,86,121,0.2) 80%); */
-    color: #ecf0f1;
+    
     padding: 3px;
     position: relative;
     border-bottom: 1px solid rgba(37, 36, 97, 0.281);
@@ -120,7 +120,7 @@
   padding: 14px;
   font-size: 16px;
 
-  color: rgb(236, 207, 13);
+  color: rgb(17, 160, 204);
   border: none;
   cursor: pointer;
 
