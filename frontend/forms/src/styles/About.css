@@ -1,0 +1,41 @@
+
+.container{
+max-width: 700px;
+margin: 2rem auto;
+padding: 2rem;
+border-radius: 8px;
+background-color: #FFFFFE;
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+
+.about-container {
+  padding: 20px;
+}
+
+.about-description {
+  margin-bottom: 20px;
+}
+
+.about-nav {
+  display: flex;
+  justify-content: space-between;
+}
+
+.buttons
+{  
+  cursor: pointer;
+  color:#fff;
+  background-color: #1e5391;
+  border-radius: 10px;
+  padding: 10px 10px;
+  transition: background-color 0.3s ease;
+  text-decoration: none;
+  font-weight: bold;
+  border: none;
+}
+
+.buttons:hover {
+  background-color: #78a52f;
+}

@@ -30,8 +30,8 @@ function Header() {
         <nav className="main-nav">
           <Link to="/">Home</Link>
           <Link to="/diabetes-info">Informacion sobre la enfermedad</Link>
-          <Link to="/clients">Nuestros Clientes</Link>
-          <Link to="/coverage">Casos de exito</Link>
+          <Link to="/project-info">Sobre el proyecto</Link>
+          
         </nav>
 
         <div className="user-actions">
@@ -46,6 +46,7 @@ function Header() {
       {isOpen && (
         <ul className="dropdown-menu">
           <li><a href="https://xgboost.readthedocs.io/en/release_3.0.0/">Sobre XGBoost</a></li>
+          <li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html">Sobre Random Forest</a></li>
           <li><a href="https://github.com/AcSsalazar/XGB_Diabetes_Classificator">GitHub</a></li>
         </ul>
       )}

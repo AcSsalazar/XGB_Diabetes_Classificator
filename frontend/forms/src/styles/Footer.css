@@ -1,152 +1,106 @@
+
+
 .rc-footer {
-  background-color: #1a1a1a; /* Darker, sleeker gray */
-  color: #ffffff;
-  padding: 3rem 1rem 1rem;
-  font-family: 'Roboto', 'Arial', sans-serif;
+  background-color: #2a294a; /* Even darker for a modern look */
+  color: #e0e0e0; /* Soft white for better readability */
+  padding: 4rem 1.5rem 2rem;
+  font-family: 'Inter', 'Roboto', 'Arial', sans-serif;
+  position: relative;
+  border-top: 1px solid #2a2a2a; /* Subtle border for separation */
+  font-family: "Poppins", sans-serif !important;
 }
 
 .footer-content {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 2rem;
-  max-width: 1280px;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2.5rem;
+  max-width: 1400px; /* Slightly wider for modern screens */
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 2rem;
 }
 
 .footer-section {
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .footer-section h3 {
-  font-size: 1.25rem;
-  margin-bottom: 1rem;
-  color: #00aaff; /* Bright cyan for headings */
-  font-weight: 500;
-}
-
-.footer-section p {
-  margin-bottom: 1rem;
-  line-height: 1.5;
-  font-size: 0.95rem;
-  color: #d0d0d0; /* Softer white */
+  font-size: 1.3rem;
+  margin-bottom: 1.2rem;
+  color: #b6bcff; /* Vibrant cyan for headings */
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
 .footer-section ul {
-  list-style-type: none;
+  list-style: none;
   padding: 0;
 }
 
 .footer-section ul li {
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.9rem;
+  font-size: 0.95rem;
 }
 
 .footer-section a {
-  color: #d0d0d0;
+  color: #5ec796; /* Light gray for links */
   text-decoration: none;
-  transition: color 0.3s ease;
+  transition: color 0.3s ease, transform 0.2s ease;
 }
 
 .footer-section a:hover {
-  color: #00aaff;
-}
-
-.social-links {
-  display: flex;
-  gap: 0.75rem;
-  margin-top: 1rem;
-}
-
-.social-links a {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  background-color: #333333;
-  border-radius: 50%;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.social-links a:hover {
-  background-color: #00aaff;
-  transform: scale(1.1);
-}
-
-.social-links i {
-  color: #ffffff;
-  font-size: 1.1rem;
-}
-
-.newsletter-form {
-  display: flex;
-  margin-top: 1rem;
-  max-width: 300px;
-}
-
-.newsletter-form input {
-  flex-grow: 1;
-  padding: 0.75rem;
-  border: none;
-  border-radius: 6px 0 0 6px;
-  background-color: #ffffff;
-  font-size: 0.9rem;
-  outline: none;
-}
-
-.newsletter-form button {
-  padding: 0.75rem 1.25rem;
-  background-color: #00aaff;
-  color: #ffffff;
-  border: none;
-  border-radius: 0 6px 6px 0;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: background-color 0.3s ease;
-}
-
-.newsletter-form button:hover {
-  background-color: #0088cc;
+  color: #1b35c9;
+  transform: translateX(4px); /* Subtle animation on hover */
 }
 
 .footer-bottom {
+  grid-column: 1 / -1; /* Span across all columns */
   text-align: center;
-  margin-top: 2.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid #333333;
+  padding-top: 2rem;
+  border-top: 1px solid #2a2a2a;
+  font-size: 0.9rem;
+  color: #90a4ae;
 }
 
 .footer-bottom p {
-  margin: 0.5rem 0;
-  font-size: 0.85rem;
-  color: #a0a0a0;
+  margin: 0;
 }
 
-.footer-bottom a {
-  color: #00aaff;
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-
-.footer-bottom a:hover {
-  color: #ffffff;
-}
-
+/* Responsive Design */
 @media (max-width: 768px) {
   .footer-content {
     grid-template-columns: 1fr;
-    padding: 0 1rem;
+    padding: 0 1.5rem;
   }
 
   .footer-section {
-    text-align: center;
+    text-align: left; /* Left-align for better readability on mobile */
   }
 
-  .social-links {
-    justify-content: center;
+  .footer-section h3 {
+    font-size: 1.2rem;
   }
 
-  .newsletter-form {
-    margin: 1rem auto;
+  .footer-bottom {
+    padding-top: 1.5rem;
   }
+}
+
+@media (max-width: 480px) {
+  .rc-footer {
+    padding: 2.5rem 1rem 1.5rem;
+  }
+
+  .footer-content {
+    gap: 1.5rem;
+  }
+
+  .footer-section ul li {
+    font-size: 0.9rem;
+  }
+}
+
+/* Accessibility */
+.rc-footer a:focus {
+  outline: 2px solid #40c4ff;
+  outline-offset: 2px;
 }

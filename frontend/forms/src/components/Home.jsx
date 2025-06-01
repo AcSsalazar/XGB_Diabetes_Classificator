@@ -19,15 +19,15 @@ const Home = () => {
             <button className="option-button">Empezar Ahora</button>
           </Link>
 
-          <Link to="/quote-searcher" className="option-card" data-gif="search">
+          <Link to="/history" className="option-card" data-gif="search">
             <h2>Ver historial de diagnosticos</h2>
-            <p>Encuentra tu diagnostico previamente generado por ID.</p>
-            <button className="option-button">Buscar Ahora</button>
+            <p>Acceso a una lista de diagnósticos previos.</p>
+            <button className="option-button">Ver Ahora</button>
           </Link>
 
-          <Link to="/about-service" className="option-card" data-gif="about">
-            <h2>Acerca de Nuestro Servicio</h2>
-            <p>Aprende más sobre cómo nuestra herramienta te ayuda.</p>
+          <Link to="/project-info" className="option-card" data-gif="about">
+            <h2>Acerca de Nuestro Proyecto</h2>
+            <p>Aprende más sobre cómo nuestra herramienta funciona.</p>
             <button className="option-button">Aprender Más</button>
           </Link>
         </section>

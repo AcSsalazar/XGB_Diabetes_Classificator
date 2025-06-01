@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../utils/api';
 import '../styles/PredictionForm.css';
+import FormResult from './FormResult'; 
+
 
 function PredictionForm() {
   const [formData, setFormData] = useState({
@@ -10,7 +12,7 @@ function PredictionForm() {
     model_name: 'xgb_scale_pos_weight',
     HighBP: 0,
     HighChol: 0,
-    BMI: 0,
+    BMI: '',
     Stroke: 0,
     HeartDiseaseorAttack: 0,
     PhysActivity: 0,
@@ -20,11 +22,12 @@ function PredictionForm() {
     PhysHlth: 0,
     DiffWalk: 0,
     Sex: 0,
-    Age: 0,
-    Education: 0,
-    Income: 0,
+    Age: '',
+    Education: '',
+    Income: '',
   });
   const [currentStep, setCurrentStep] = useState(0);
+  const [showResult, setShowResult] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
   const [fieldError, setFieldError] = useState('');
@@ -36,7 +39,7 @@ function PredictionForm() {
     model_name: 'Modelo de Machine Learning a utilizar',
     HighBP: '¿Sufre usted de presión alta?',
     HighChol: '¿Sus niveles de colesterol son altos?',
-    BMI: 'Índice de masa corporal IMC 12-98',
+    BMI: 'Cual es su indice de masa corporal (Peso/Altura²) IMC 12-98 ?',
     Stroke: '¿Ha sufrido alguna vez un accidente cerebrovascular?',
     HeartDiseaseorAttack: '¿Ha sufrido o sufre de una afección cardíaca?',
     PhysActivity: '¿Realiza actividad física al menos 2 veces por semana?',
@@ -48,7 +51,7 @@ function PredictionForm() {
     Sex: 'Genero',
     Age: 'Seleccione el número correspondiente al rango donde se encuentra su edad ',
     Education: 'Seleccione el rango correspondiente a su nivel de Educación',
-    Income: 'Seleccione el rango correspondiente a su nivel de Ingresos',
+    Income: 'Seleccione el rango correspondiente a su nivel de ingresos anuales (millones COP)',
   };
 
   const binaryFields = [
@@ -87,6 +90,17 @@ function PredictionForm() {
       { value: '5', label: 'Postgrado (Especialidad)' },
       { value: '6', label: 'Magister / PhD' },
     ],
+
+    Income: [
+      { value: '1', label: 'Menos de 12 millones' },
+      { value: '2', label: '12-24 millones' },
+      { value: '3', label: '24-36 millones' },
+      { value: '4', label: '36-48 millones' },
+      { value: '5', label: '48-60 millones' },
+      { value: '6', label: '60-72 millones' },
+      { value: '7', label: '72-84 millones' },
+      { value: '8', label: 'Más de 84 millones' }
+    ]
   };
 
   const fields = [
@@ -101,10 +115,19 @@ function PredictionForm() {
 
   const validateField = (field, value) => {
     if (field === 'username') {
-      if (!value.trim()) {
-        return 'El nombre de usuario es obligatorio';
+      const trimmed = value.trim();
+      if (!trimmed) {
+        return 'El nombre de usuario no puede estar vacío';
+      }
+      if (trimmed.length <3 || trimmed.length > 20) {
+        return 'El nombre de usuario debe tener entre 3 y 20 caracteres';
+      }
+
+      if (!/^[a-zA-Z\s]+$/.test(trimmed)) {
+        return 'El nombre de usuario solo puede contener letras';
       }
       return '';
+
     }
     if (field === 'model_name') {
       if (!value) {
@@ -161,11 +184,24 @@ function PredictionForm() {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    console.log('Payload being sent:', formData);
-    try {
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError('');
+
+  // Validar el último campo manualmente
+  const currentField = fields[currentStep];
+  const validationError = validateField(currentField, formData[currentField]);
+
+  if (validationError) {
+    setFieldError(validationError);
+    setIsCurrentFieldValid(false);
+    return;
+  }
+
+  console.log('Payload being sent:', formData);
+  try {
+    
+
       const res = await api.post('/predict/', {
         ...formData,
         // Convert string values to numbers where required
@@ -186,6 +222,8 @@ function PredictionForm() {
         Sex: parseInt(formData.Sex),
       });
       setResult(res);
+      console.log("Resultado Procesado", res);
+      setShowResult(true);
     } catch (err) {
       console.error(err);
       setError('Error en la predicción. Revisa la consola.');
@@ -239,6 +277,8 @@ function PredictionForm() {
                 <option value="">Seleccione un modelo</option>
                 <option value="xgb_scale_pos_weight">XGBoost Scale Pos Weight</option>
                 <option value="xgb_smote_gridsearch">XGBoost SMOTE + GridSearch</option>
+                <option value="Model03">XGBoost (GridSearch)</option>
+                <option value="RFC">Random Forest</option>
               </select>
             ) : currentField === 'Age' ? (
               <select
@@ -253,7 +293,26 @@ function PredictionForm() {
                     {option.label}
                   </option>
                 ))}
+
+
+
+
               </select>
+            ) : currentField === 'Income' ? (
+              <select
+                name={currentField}
+                value={formData[currentField]}
+                onChange={handleChange}
+                className="form-select"
+              >
+                <option value="">Seleccione su nivel de ingresos</option>
+                {rangeOptions.Income.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+
             ) : currentField === 'GenHlth' ? (
               <select
                 name={currentField}
@@ -315,7 +374,7 @@ function PredictionForm() {
                 name={currentField}
                 value={formData[currentField]}
                 onChange={handleChange}
-                min={currentField === 'BMI' ? 0 : 0}
+                min={currentField === 'BMI' ? 12 : 1}
                 max={currentField === 'MentHlth' || currentField === 'PhysHlth' ? 30 : currentField === 'Income' ? 8 : undefined}
                 step="1"
                 className="form-input"
@@ -325,11 +384,12 @@ function PredictionForm() {
             {fieldError && <p className="field-error">{fieldError}</p>}
           </div>
           <div className="form-navigation">
-            {currentStep > 0 && (
-              <button type="button" onClick={handleBack} className="nav-button back-button">
-                Atrás
-              </button>
-            )}
+{currentStep > 0 && currentStep < fields.length - 1 && (
+  <button type="button" onClick={handleBack} className="nav-button back-button">
+    Atrás
+  </button>
+)}
+
             {currentStep < fields.length - 1 ? (
               <button
                 type="button"
@@ -347,16 +407,23 @@ function PredictionForm() {
               >
                 Enviar
               </button>
+              
+
             )}
           </div>
         </form>
         {error && <p className="form-error">{error}</p>}
-        {result && (
-          <div className="form-result">
-            <h3>{result.riesgo}</h3>
-            <p>Nivel de probabilidad: {result.probabilidad}</p>
-          </div>
-        )}
+{showResult && result && (
+  <FormResult
+    result={result}
+    onClose={() => {
+      setShowResult(false);
+      setResult(null); // limpia el estado después de cerrar
+    }}
+  />
+)}
+
+
       </div>
     </div>
   );

@@ -1,10 +1,14 @@
 import React from "react";
 
 const DiabetesInfo = () => (
-    <div style={{ maxWidth: 700, margin: "2rem auto", padding: "2rem", background: "#f9f9f9", borderRadius: 8 }}>
+    <div className="container">
         <h1>Información General sobre la Diabetes</h1>
         <p>
-            La <strong>diabetes</strong> es una enfermedad crónica que afecta la forma en que el cuerpo convierte los alimentos en energía. Se caracteriza por niveles elevados de glucosa (azúcar) en la sangre debido a problemas en la producción o el uso de insulina.
+            La diabetes es una enfermedad metabólica crónica caracterizada 
+            por niveles elevados de glucosa en sangre (o azúcar en sangre), que con el tiempo conduce a daños graves en el corazón, los vasos sanguíneos, los ojos, los riñones y los nervios. La más común es la diabetes tipo 2, 
+            generalmente en adultos, que ocurre cuando el cuerpo se vuelve resistente a la insulina o no produce suficiente insulina. En las últimas tres décadas, la prevalencia de la diabetes tipo 2 ha aumentado drásticamente en países de todos los niveles de ingresos. La diabetes tipo 1, una vez conocida 
+            como diabetes juvenil o diabetes insulinodependiente, es una afección crónica en la que el páncreas produce poca o ninguna insulina por sí mismo. Para las personas que viven con diabetes, el acceso a un tratamiento asequible, incluida la insulina, es fundamental para su supervivencia. Existe un objetivo acordado a nivel mundial 
+            para detener el aumento de la diabetes y la obesidad para 2025.
         </p>
         <h2>Tipos principales de diabetes</h2>
         <ul>

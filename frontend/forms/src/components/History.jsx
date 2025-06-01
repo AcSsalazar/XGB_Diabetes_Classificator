@@ -48,7 +48,7 @@ function History() {
                   <td>{new Date(pred.created_at).toLocaleString()}</td>
                   <td>{pred.username || 'Anonymous'}</td>
                   <td>{pred.input_data.model_name || 'Unknown'}</td>
-                  <td>{pred.risk_level}</td>
+                  <td>{pred.risk_level.slice(0, 15) + '...' }</td>
                   <td>{pred.probability.toFixed(3)}</td>
                   <td>{JSON.stringify(pred.input_data, null, 2).slice(0, 50)}...</td>
                 </tr>

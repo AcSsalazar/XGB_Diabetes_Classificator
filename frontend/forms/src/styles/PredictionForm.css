@@ -1,9 +1,9 @@
 /* Form Container */
 .form-container {
-  min-height: 100vh;
+  min-height: 80vh;
   display: flex;
   justify-content: center;
-  padding: 2rem;
+  padding: 1.2rem;
   background-color: #9fa6cec5;
   color: rgb(5, 50, 100);
 }
@@ -18,7 +18,7 @@
 /* Form Card */
 .form-card {
   background-color: #f5faff;
-  padding: 2rem;
+  padding: 1.2rem;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   width: 100%;

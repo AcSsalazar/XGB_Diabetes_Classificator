@@ -1,6 +1,7 @@
 body {
   font-family: "Poppins", sans-serif;
-  background-color: #f0f4f8;
+background: #d9e3ff;
+background: radial-gradient(circle, rgba(217, 227, 255, 1) 35%, rgba(224, 245, 255, 0.83) 100%);
   color: #333;
   margin: 0;
   padding: 0;
