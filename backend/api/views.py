@@ -1,37 +1,36 @@
-import os
+import boto3
 import joblib
 import numpy as np
 import logging
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Prediction
+import os
+import tempfile
 
-# Logger
 logger = logging.getLogger(__name__)
 
-# Local model paths
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-# Define model paths
+S3_BUCKET = os.environ.get('S3_BUCKET_NAME', 'diabetes-models')
 MODEL_PATHS = {
-    'xgb_scale_pos_weight': os.path.join(BASE_DIR, 'models', 'xgb_scale_pos_weight.pkl'),
-    'xgb_smote_gridsearch': os.path.join(BASE_DIR, 'models', 'xgb_smote_gridsearch.pkl'),
-    'Model03': os.path.join(BASE_DIR, 'models', 'Model03.pkl'),
-    'RFC': os.path.join(BASE_DIR, 'models', 'RFC.pkl'),
+    'xgb_scale_pos_weight': 'models/xgb_scale_pos_weight.pkl',
+    'xgb_smote_gridsearch': 'models/xgb_smote_gridsearch.pkl',
+    'Model03': 'models/Model03.pkl',
+    'RFC': 'models/RFC.pkl',
 }
 
-# Load models
+s3_client = boto3.client('s3')
+
 models = {}
 try:
-    for model_name, model_path in MODEL_PATHS.items():
-        if not os.path.exists(model_path):
-            logger.error(f"Model file not found: {model_path}")
-            raise FileNotFoundError(f"Model file not found: {model_path}")
-        model, feature_order, threshold = joblib.load(model_path)
-        models[model_name] = {'model': model, 'feature_order': feature_order, 'threshold': threshold}
-        logger.info(f"Loaded model {model_name} from {model_path}")
+    for model_name, key in MODEL_PATHS.items():
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.pkl') as tmp:
+            s3_client.download_file(S3_BUCKET, key, tmp.name)
+            model, feature_order, threshold = joblib.load(tmp.name)
+            models[model_name] = {'model': model, 'feature_order': feature_order, 'threshold': threshold}
+            logger.info(f"Loaded model {model_name} from S3: {key}")
+            os.unlink(tmp.name)
 except Exception as e:
-    logger.exception(f"Error loading models: {e}")
+    logger.exception(f"Error loading models from S3: {e}")
     raise RuntimeError("Failed to load models")
 
 @api_view(['POST'])
@@ -39,8 +38,6 @@ def predict(request):
     data = request.data
     logger.debug(f"Received payload: {data}")
     try:
-        # Va\
-        # lidate required fields
         required_fields = [
             'HighBP', 'HighChol', 'BMI', 'Stroke', 'HeartDiseaseorAttack',
             'PhysActivity', 'HvyAlcoholConsump', 'GenHlth', 'MentHlth',
@@ -51,18 +48,15 @@ def predict(request):
             logger.error(f"Missing fields: {missing}")
             return Response({'error': f'Missing fields: {missing}'}, status=400)
 
-        # Validate model selection
-        model_name = data.get('model_name', 'xgb_scale_pos_weight')  # Default to first model
+        model_name = data.get('model_name', 'xgb_scale_pos_weight')
         if model_name not in models:
             logger.error(f"Invalid model name: {model_name}")
             return Response({'error': f'Invalid model: {model_name}'}, status=400)
 
-        # Validate username
         username = data.get('username', '')
         if not username:
             logger.warning("No username provided")
 
-        # Construct input array
         model_info = models[model_name]
         feature_order = model_info['feature_order']
         try:
@@ -72,12 +66,10 @@ def predict(request):
             logger.error(f"Invalid numeric values: {e}")
             return Response({'error': 'All fields must be numeric'}, status=400)
 
-        # Predict
         model = model_info['model']
         prob = float(model.predict_proba(arr)[0, 1])
         logger.debug(f"Prediction probability: {prob}")
 
-        # Classify risk based on model
         if model_name == 'xgb_scale_pos_weight':
             if prob < 0.3:
                 riesgo = "Excelente noticia! Tu resultado indica un riesgo bajo de padecer diabetes. Es un alivio recibir esta clasificación, y te animamos a mantener ese buen camino. Aunque el riesgo sea bajo, la prevención sigue siendo clave. Te recomendamos continuar con un estilo de vida saludable que incluya una dieta equilibrada y actividad física regular. Si experimentas síntomas preocupantes o tienes inquietudes en el futuro, no dudes en consultar a un profesional de la salud. Un chequeo médico anual siempre es una buena práctica para asegurar tu bienestar general."
@@ -98,9 +90,8 @@ def predict(request):
             elif prob < 0.4:
                 riesgo = "Tu resultado indica un riesgo moderado de desarrollar diabetes. Entendemos que esta noticia puede generar cierta preocupación, pero es importante recordar que este conocimiento es una gran oportunidad para actuar a tiempo. Un riesgo moderado significa que hay medidas proactivas que puedes tomar para reducirlo significativamente o incluso revertirlo. Te aconsejamos encarecidamente programar una cita con tu médico de cabecera lo antes posible para discutir este resultado. Ellos podrán realizar pruebas adicionales y diseñar un plan personalizado que puede incluir cambios en el estilo de vida, como ajustes en la dieta y más ejercicio. Recuerda, no estás solo en este camino, y el apoyo profesional puede marcar una gran diferencia."
             else:
-                riesgo = "Tu resultado indica un riesgo alto de padecer diabetes. Sabemos que esta noticia puede ser abrumadora y generar emociones difíciles. Queremos que sepas que es completamente normal sentirse así, y que no estás solo. Este resultado es una señal clara de que es crucial tomar acción inmediata. Te urgimos a que busques atención médica especializada sin demora. Un médico, preferiblemente un endocrinólogo, podrá confirmar el diagnóstico, iniciar el tratamiento adecuado y guiarte a través de los próximos pasos. Hay muchas opciones de tratamiento y manejo que pueden ayudarte a llevar una vida plena y saludable. El apoyo emocional es fundamental en este proceso; considera hablar con amigos, familiares o un grupo de apoyo. Estás en un momento importante para tomar el control de tu salud, y hay recursos y personas dispuestas a ayudarte"
+                riesgo = "Tu resultado indica un riesgo alto de padecer diabetes. Sabemos que esta noticia puede ser abrumadora y generar emociones difíciles. Queremos que sepas que es completamente normal sentirse así, y que no estás solo. Este resultado es una señal clara de que es crucial tomar acción inmediata. Te urgimos a que busques atención médica especializada sin demora. Un médico, preferiblemente un endocrinólogo, podrá confirmar el diagnóstico, iniciar el tratamiento adecuado y guiarte a través de los próximos pasos. Hay muchas opciones de tratamiento y manejo que pueden ayudarte a llevar una vida plena y saludable. El apoyo emocional es fundamental en este proceso; considera hablar con amigos, familiares o un grupo de apoyo. Estás en un momento importante para tomar el control de tu salud, y hay recursos y personas dispuestas a ayudarte."
 
-        # Save to database
         Prediction.objects.create(
             input_data=data,
             probability=round(prob, 3),
