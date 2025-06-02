@@ -8,7 +8,11 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-$oqcz7$oecqsd7
 
 DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['.elasticbeanstalk.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = [
+    'predict-env.eba-qej3szwp.us-east-1.elasticbeanstalk.com',
+    'localhost',
+    '127.0.0.1'
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -34,7 +38,7 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    'https://your-amplify-app-id.amplifyapp.com',  # Update after Amplify deployment
+    'http://predict-env.eba-qej3szwp.us-east-1.elasticbeanstalk.com',
     'http://localhost:5173',
 ]
 
@@ -59,8 +63,8 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'),
         conn_max_age=600,
+        conn_health_checks=True
     )
 }
 
