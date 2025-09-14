@@ -22,17 +22,24 @@ MODEL_PATHS = {
 
 # Load models
 models = {}
-try:
-    for model_name, model_path in MODEL_PATHS.items():
-        if not os.path.exists(model_path):
-            logger.error(f"Model file not found: {model_path}")
-            raise FileNotFoundError(f"Model file not found: {model_path}")
-        model, feature_order, threshold = joblib.load(model_path)
-        models[model_name] = {'model': model, 'feature_order': feature_order, 'threshold': threshold}
-        logger.info(f"Loaded model {model_name} from {model_path}")
-except Exception as e:
-    logger.exception(f"Error loading models: {e}")
-    raise RuntimeError("Failed to load models")
+available_models = []
+for model_name, model_path in MODEL_PATHS.items():
+    try:
+        if os.path.exists(model_path):
+            model, feature_order, threshold = joblib.load(model_path)
+            models[model_name] = {'model': model, 'feature_order': feature_order, 'threshold': threshold}
+            available_models.append(model_name)
+            logger.info(f"Loaded model {model_name} from {model_path}")
+        else:
+            logger.warning(f"Model file not found: {model_path} - Skipping this model")
+    except Exception as e:
+        logger.error(f"Error loading model {model_name}: {e}")
+
+if not models:
+    logger.error("No models could be loaded!")
+    raise RuntimeError("No models available - ensure at least one model file exists in the models directory")
+
+logger.info(f"Successfully loaded {len(models)} models: {list(models.keys())}")
 
 @api_view(['POST'])
 def predict(request):
@@ -51,11 +58,14 @@ def predict(request):
             logger.error(f"Missing fields: {missing}")
             return Response({'error': f'Missing fields: {missing}'}, status=400)
 
-        # Validate model selection
-        model_name = data.get('model_name', 'xgb_scale_pos_weight')  # Default to first model
+        # Validate model selection - use first available model as default
+        default_model = list(models.keys())[0] if models else 'xgb_scale_pos_weight'
+        model_name = data.get('model_name', default_model)
         if model_name not in models:
-            logger.error(f"Invalid model name: {model_name}")
-            return Response({'error': f'Invalid model: {model_name}'}, status=400)
+            logger.error(f"Invalid model name: {model_name}. Available models: {list(models.keys())}")
+            return Response({
+                'error': f'Invalid model: {model_name}. Available models: {list(models.keys())}'
+            }, status=400)
 
         # Validate username
         username = data.get('username', '')
@@ -121,3 +131,16 @@ def get_predictions(request):
     except Exception as e:
         logger.exception(f"Error in get_predictions(): {e}")
         return Response({'error': 'Failed to fetch predictions'}, status=500)
+
+@api_view(['GET'])
+def get_available_models(request):
+    """Return list of available ML models"""
+    try:
+        return Response({
+            'available_models': list(models.keys()),
+            'default_model': list(models.keys())[0] if models else None,
+            'total_models': len(models)
+        })
+    except Exception as e:
+        logger.exception(f"Error in get_available_models(): {e}")
+        return Response({'error': 'Failed to fetch available models'}, status=500)
